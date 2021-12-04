@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cropper Easy</title>
+</head>
+<body>
+    
+    <div id="cropper_easy">
+        <div id="cropper_easy_inner">
+            <img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg10.51tietu.net%2Fpic%2F20191029%2F0yw1zrc5ygu0yw1zrc5ygu.jpg&refer=http%3A%2F%2Fimg10.51tietu.net&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1641149103&t=409c99158a88c05ac9e9f96ed098ea45" id="cropper_easy_inner_img" crossOrigin="Anonymous" onload="init()">
+            <div id="cropper_easy_inner_window"></div>
+        </div>            
+    </div>
+    <br/>
+    <button onclick="show()">裁剪</button>
+    <button onclick="reset()">重置</button>
+    <br/><br/>
+    <img id="view" style="width: 270px; height: auto;">
+
+    <script>
+        var Shear = (function(ratio) {
+            this.result = '';
+            this.x_or_y_touch = false;
+            this.img = document.getElementById('cropper_easy_inner_img');
+            this.shear = document.getElementById('cropper_easy_inner_window');
+
+            this._wh = function() { this.s_w = this.shear.clientWidth; this.s_h = this.shear.clientHeight; }  
+            this._location = function() {
+                return [ this.shear.offsetLeft - (this.shear.clientWidth / 2), this.shear.offsetTop - (this.shear.clientHeight / 2) ]
+            }          
+            this.init = function() {
+                // 新建 宽高数据
+                this.i_w = this.img.clientWidth;
+                this.i_h = this.img.clientHeight;
+                this._wh();
+                // 绑定 剪裁框 拖动 方法
+                this._move( this.shear );
+                // 初始化 剪裁框
+                this.correctWindow();
+                // 重新刷新 宽高数据
+                this._wh();
+            }
+            // 重置剪裁 与 重置剪裁框
+            this.resetWindow = function() {
+                this.shear.style.top = '50%';
+                this.shear.style.left = '50%';
+                this.img.style.clipPath = `inset(0px 0px 0px 0px)`;
+            }
+
+            this.clippingImg = function() {
+                this._wh();
+                var xy = this._location();
+                var _t = xy[1] - this.img.offsetTop;
+                var _l = xy[0] - this.img.offsetLeft;
+                this._crop_img(
+                    _t,
+                    ( this.i_h - this.s_h - _t ),
+                    _l,
+                    ( this.i_w - this.s_w - _l ) 
+                );
+            }
+            this.getResult = function() {
+                this._wh();
+                var xy = this._location();
+                return this._draw(
+                    this.img,
+                    xy[0], xy[1],
+                    this.s_w, this.s_h
+                );
+            }
+
+            this.correctWindow = function() {
+                this._wh();
+                var res = this._beyond_side();
+                var w = this._correct_w(res);
+                this.x_or_y_touch = (w > (this.i_w - 1)) ? false : true;
+                if (res != 0) { this._set_shear(w); }
+            }
+            this._correct_w = function(res) {
+                var w = 0;
+                if (res[0] && res[1]) {
+                    w = (this._contrast() > 0) ? this.i_w : ( this.i_h * ratio );
+                } else {
+                    if (res[0] && !res[1]) { w = this.i_w; }
+                    else {
+                        w = this.i_h * ratio;
+                        w = w > this.i_w ? this.i_w : w;
+                    }
+                } return w;
+            }
+            
+            this._contrast = function() { 
+                var w = this.s_w;
+                var h = this.s_h;
+                var _cts = w - h;
+                _cts = _cts > 0 ? ( (w / h) - ratio ) : ( ratio - (w / h) );
+                return _cts;
+            }
+            this._beyond_side = function() {
+                var _lg = [ ( this.s_w > this.i_w ), ( this.s_h > this.i_h ) ];
+                if (!_lg[0] && !_lg[1]) {
+                    var _cts = this._contrast();
+                    if (_cts != 0) {
+                        _lg = (_cts > 0) ? [ true, false ] : [ false, true ];
+                    } else { return 0; }
+                } return _lg;
+            }
+
+            this._set_shear = function(w) { 
+                this.shear.style.width = w + 'px';
+                this.shear.style.height = (w / ratio) + 'px'; 
+            }
+            this._crop_img = function(t, r, b, l) {
+                this.img.style.clipPath = 'inset(' + t + 'px, ' + r + 'px, ' + b + 'px, ' + l + 'px)';
+            },
+            // 移动 与 触底
+            this._move = function(_dom) {
+                var _this = this;
+                var disX = 0;
+                var disY = 0;
+                _dom.onmousedown = function(ev) {
+                    var e = ev||event;
+                    disX = e.clientX - _dom.offsetLeft;
+                    disY = e.clientY - _dom.offsetTop;
+                    document.onmousemove = function(ev) { // document.onmousemove可避免鼠标移动的块位置问题
+                        var _e = ev || event;
+                        var x = _e.clientX - disX;
+                        var y = _e.clientY - disY;
+                        _this._touch_x_y(x, y);
+                    };
+                    document.onmouseup = () => { document.onmousemove = null; document.onmouseup = null; }
+                }
+            }
+            this._touch_x_y = function(x, y) {
+                if (this.x_or_y_touch) {
+                    var l_x = this.s_w / 2;
+                    var r_x = this.i_w - l_x;
+                    x = x > l_x ? x : (l_x - 0.5);
+                    x = x < r_x ? x : (r_x + 0.5);
+                    this.shear.style.left = x + 'px';
+                } else {
+                    var t_y = this.s_h / 2;
+                    var b_y = this.i_h - t_y;
+                    y = y > t_y ? y : (t_y - 0.5);
+                    y = y < b_y ? y : (b_y + 0.5);
+                    this.shear.style.top = y + 'px';
+                }
+            }
+
+            // 绘图
+            this._mapping_draw = function(_img, x, y, w, h, w_ntr, h_ntr) {
+                w = w / this.i_w * w_ntr;
+                h = h / this.i_h * h_ntr;
+                x = x / this.i_w * w_ntr;
+                y = y / this.i_w * w_ntr;
+                x = x < 0 ? 0 : x; 
+                y = y < 0 ? 0 : y;
+                return [ x, y, w, h];
+            },
+            this._draw = function(_img, x, y, w, h) {
+                var w_ntr = _img.naturalWidth;
+                var h_ntr = _img.naturalHeight;
+                var _map = this._mapping_draw(_img, x, y, w, h, w_ntr, h_ntr);
+                x = _map[0];
+                y = _map[1];
+                w = _map[2];
+                h = _map[3];
+
+                var cv = document.createElement("canvas");
+                cv.width = (w + x) > w_ntr ? (w_ntr - x) : w;
+                cv.height = (h + y) > h_ntr ? (h_ntr - y) : h;
+                cv.getContext("2d").drawImage(_img,
+                    x, y, 
+                    w_ntr, h_ntr,
+                    0, 0,
+                    w_ntr, h_ntr
+                );
+                return cv.toDataURL();
+            }
+        })
+
+        var s = new Shear(9 / 16)
+
+        var init = function() {
+            s.init()
+        }
+        var reset = function() {
+            s.resetWindow()
+        }
+        var show = function() {
+            document.getElementById('view').src = s.getResult()
+        }
+    </script>
+
+    <style>
+        button {
+            border: none;
+            cursor: pointer;
+            padding: 6px 24px;
+            border-radius: 1px;
+        }
+
+        /* CROPPER EASY CSS */
+        #cropper_easy,
+        #cropper_easy_inner,
+        #cropper_easy_inner_img,
+        #cropper_easy_inner_window {
+            display: block;
+            box-sizing: border-box !important;
+        }
+
+        #cropper_easy {
+            background: #00000008;
+            background-image: linear-gradient(45deg, #00000092 25%, transparent 0, transparent 75%, #00000092 0), linear-gradient(45deg, #00000092 25%, transparent 0, transparent 75%, #00000092 0);
+            background-position: 0 0, 15px 15px;
+            background-size: 30px 30px;
+        }
+
+        #cropper_easy_inner {
+            overflow: hidden;
+            position: relative !important;
+        }
+
+        #cropper_easy_inner_img {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        #cropper_easy_inner_window {
+            outline: rgba(0, 0, 0, 0.4) solid thick !important;
+            outline-width: 100vw !important;
+            position: absolute !important;
+            top: 50%;
+            left: 50%;
+            width: 1px;
+            height: 1px;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+        }
+        /*
+        #cropper_easy_inner_window {
+            outline-color: rgba(255, 255, 255, 0.4) !important;
+        }
+        */
+    </style>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cropper Easy</title>
+
+    <script src="./shear.js"></script>
+    <link rel="stylesheet" href="./shear.css">
+
+</head>
+<body>
+    <div class="row">
+        <div class="col">
+
+            <!-- START -->
+                <div id="cropper_easy">
+                    <div id="cropper_easy_inner">
+                        <img src="" id="cropper_easy_inner_img" crossOrigin="Anonymous" onload="init()">
+                        <div id="cropper_easy_inner_window"></div>
+                    </div>            
+                </div>
+            <!-- END -->
+
+
+            <br/>
+            <button onclick="show()">Cut Images</button>
+            <button onclick="reset()">Reset</button>
+            <button onclick="circular()">Circular</button>
+            <select onchange="changeImg()" id="select">
+                <option value="0">Image One</option>
+                <option value="1">Image Two</option>
+                <option value="2">Image Three</option>
+            </select>
+            <br/>
+            <br/>
+        </div>
+        <div class="col view">
+            <img id="view">
+        </div>
+    </div>
+
+    <script>
+
+        var s = new Shear(9 / 16)
+
+        var init = function() { s.init() }
+
+        var reset = function() {
+            s.reset()
+        }
+        var circular = function() {
+            s.circular()
+        }
+
+        var show = function() {
+            document.getElementById('view').src = s.result()
+        }
+
+
+        var imgs = [
+            "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg10.51tietu.net%2Fpic%2F20191029%2F0yw1zrc5ygu0yw1zrc5ygu.jpg&refer=http%3A%2F%2Fimg10.51tietu.net&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1641149103&t=409c99158a88c05ac9e9f96ed098ea45",
+            "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fi0.hdslb.com%2Fbfs%2Farticle%2F98a28ae388706a7c05f734caa53bb5a8278a3870.png&refer=http%3A%2F%2Fi0.hdslb.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1641230447&t=d6d943ece3af59c73e41125fa5e67305",
+            "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201704%2F25%2F20170425125702_anzT8.jpeg&refer=http%3A%2F%2Fb-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1641229709&t=180971553c3d93f9fe4585b49c065f1f"
+        ]
+
+        var the_img = document.getElementById('cropper_easy_inner_img');
+        function changeImg() {
+            var a = document.getElementById('select').selectedIndex;
+            the_img.src = imgs[a]
+        }
+
+        changeImg()
+    </script>
+
+    <style>
+        select,
+        button {
+            border: none;
+            cursor: pointer;
+            padding: 6px 24px;
+            border-radius: 1px;
+            background-color: #EFEFEF;
+        }
+        select {
+            padding: 5px 24px;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            box-sizing: border-box;
+            margin: 0px -12px;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+        .col {
+            width: 50%;
+            padding: 0px 12px;
+            box-sizing: border-box;
+        }
+        .view {
+        }
+        .view img {
+            width: 100%;
+            height: auto;
+        }
+
+        @media screen and (max-width: 769px) {
+            .col {
+                width: 100%
+            }
+        }
+    </style>
+</body>
+</html>
