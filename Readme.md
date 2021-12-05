@@ -5,3 +5,5 @@ An amazing picture clipping plugin modeled after CropperJS.
 #### How to use it  
 After looking at the HTML file in the folder, you will understand.  
 看完文件夹里面的html文件，你就明白了。
+   
+ssh -T git@github.com 

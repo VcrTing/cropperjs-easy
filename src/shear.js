@@ -34,7 +34,7 @@ var Shear = (function(ratio) {
         this.shear.style.height = '100%';
         this.set_shear_zoom(this.i_w, 1);
         this.set_shear_zoom(this.i_w, 1);
-        this.img.style.clipPath = `inset(0px 0px 0px 0px)`;
+        this.img.style.clipPath = "inset(0px 0px 0px 0px)";
 
         this._fix_location();
     }
@@ -136,7 +136,7 @@ var Shear = (function(ratio) {
                     _e.clientY - disY
                 );
             };
-            document.onmouseup = () => { document.onmousemove = null; document.onmouseup = null; }
+            document.onmouseup = function () { document.onmousemove = null; document.onmouseup = null; }
         }
     }
 
@@ -150,7 +150,7 @@ var Shear = (function(ratio) {
             _t,
             ( this.i_h - this.s_h - _t ), // bottom
             _l,
-            ( this.i_w - this.s_w - _l ), // righg
+            ( this.i_w - this.s_w - _l )
         );
     }
     this._crop_img = function(t, b, l, r) {
