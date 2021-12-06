@@ -1,5 +1,5 @@
 ## Cropper Easy  
-### An amazing picture clipping plugin modeled after CropperJS.  
+### An amazing picture clipping plugin modeled after [Cropperjs](https://github.com/fengyuanchen/cropperjs).  
 ### 仿写 [cropperjs](https://github.com/fengyuanchen/cropperjs) 的一个惊人的图片剪裁插件。 
   
 #### How to use it  
