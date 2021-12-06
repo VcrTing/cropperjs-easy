@@ -12,4 +12,4 @@ After looking at the HTML file in the folder, you will understand.
 Mobie support will be added in the next release, if you can't wait, why not add the source code yourself.  
 下个版本会增加Mobie端的支持。
    
-[作者](https://github.com/VcrTing)
+[💗](https://github.com/VcrTing)
